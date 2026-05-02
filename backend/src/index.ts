@@ -13,15 +13,45 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+// Get your local IP address dynamically
+const getLocalIp = () => {
+    const { networkInterfaces } = require('os');
+    const nets = networkInterfaces();
+
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+            if (net.family === 'IPv4' && !net.internal) {
+                return net.address;
+            }
+        }
+    }
+    return 'localhost';
+};
+
+const localIp = getLocalIp();
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
+// Configure CORS for Socket.IO and Express
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',')
+    : (isDevelopment
+        ? ['http://localhost:3000', `http://${localIp}:3000`, 'http://172.16.2.99:3000']
+        : ['https://yourdomain.com']);
+
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
-        credentials: true
+        origin: allowedOrigins,
+        credentials: true,
+        methods: ["GET", "POST"]
     }
 });
 
-// Middleware
-app.use(cors());
+// Express CORS middleware
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true
+}));
 app.use(express.json());
 
 // Routes
@@ -37,15 +67,19 @@ app.get("/health", (req, res) => {
 setupSocket(io);
 
 // Start server
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT || '5000', 10); // Convert to number
+const HOST = process.env.HOST || '0.0.0.0';
 
 AppDataSource.initialize()
     .then(() => {
         console.log("✅ Database connected");
 
-        server.listen(PORT, () => {
-            console.log(`🚀 Server running on http://localhost:${PORT}`);
+        server.listen(PORT, HOST, () => {
+            console.log(`🚀 Server running on:`);
+            console.log(`   - Local: http://localhost:${PORT}`);
+            console.log(`   - Network: http://${localIp}:${PORT}`);
             console.log(`🔌 Socket.io ready`);
+            console.log(`📡 Allowed origins:`, allowedOrigins);
         });
     })
     .catch((error) => {
