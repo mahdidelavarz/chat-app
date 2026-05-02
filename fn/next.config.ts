@@ -1,19 +1,21 @@
 import type { NextConfig } from "next";
 import withSerwist from "@serwist/next";
+import { getConfig } from "./config";
 
+const { backendUrl, allowedOrigins } = getConfig();
 const nextConfig: NextConfig = {
-  // Add empty turbopack config to silence warning
+  allowedDevOrigins: allowedOrigins,
   turbopack: {},
-  
+
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:5000/api/:path*',
+        destination: `${backendUrl}/api/:path*`,
       },
       {
         source: '/socket.io/:path*',
-        destination: 'http://localhost:5000/socket.io/:path*',
+        destination: `${backendUrl}/socket.io/:path*`,
       },
     ];
   },

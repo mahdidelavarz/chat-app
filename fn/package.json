@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "dev:network": "cross-env BACKEND_URL=http://172.16.2.99:5000 next dev",
     "start": "next start",
     "lint": "eslint",
     "https-start": "set NODE_ENV=production && node server.js"
@@ -24,6 +25,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "tailwindcss": "^4",

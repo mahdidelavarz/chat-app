@@ -1,21 +1,21 @@
 import type { Metadata } from 'next';
 import './globals.css';
 
-export const metadata: Metadata = {
-  title: 'Chat App',
-  description: 'Real-time chat application',
-  manifest: '/manifest.json',
-  themeColor: '#3b82f6',
-  viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'Chat App',
-  },
-  formatDetection: {
-    telephone: false,
-  },
-};
+// export const metadata: Metadata = {
+//   title: 'Chat App',
+//   description: 'Real-time chat application',
+//   manifest: '/manifest.json',
+//   // themeColor: '#3b82f6',
+//   viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
+//   appleWebApp: {
+//     capable: true,
+//     statusBarStyle: 'default',
+//     title: 'Chat App',
+//   },
+//   formatDetection: {
+//     telephone: true,
+//   },
+// };
 
 export default function RootLayout({
   children,

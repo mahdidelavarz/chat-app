@@ -2,6 +2,8 @@ import axios, { type AxiosInstance } from 'axios';
 import { io, Socket } from 'socket.io-client';
 import type { AuthResponse, LoginCredentials, Message, RegisterData, User } from '../types';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL ;
+
 class ApiService {
     private api: AxiosInstance;
     private socket: Socket | null = null;
@@ -52,7 +54,7 @@ class ApiService {
     connectSocket(userId: number): Socket {
         if (typeof window === 'undefined') return null as any;
 
-        this.socket = io('http://localhost:5000', {
+        this.socket = io(API_URL, {
             transports: ['websocket'],
             path: '/socket.io',
         });
