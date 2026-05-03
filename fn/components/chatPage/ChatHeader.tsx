@@ -10,11 +10,11 @@ interface ChatHeaderProps {
 
 export default function ChatHeader({ selectedUser, isTyping, isOnline }: ChatHeaderProps) {
   return (
-    <div className="bg-gradient-to-r from-[#1D2733] to-[#222E3C] p-3 sm:p-4 border-b border-gray-700/50 shadow-xl backdrop-blur-xl shrink-0">
+    <div className="bg-linear-to-r from-[#1D2733] to-[#222E3C] p-3 sm:p-4 border-b border-gray-700/50 shadow-xl backdrop-blur-xl shrink-0">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 pl-15">
           <div className="relative shrink-0">
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex justify-center items-center">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex justify-center items-center">
               <span className="text-white font-semibold text-sm">
                 {(selectedUser.fullName || selectedUser.username).charAt(0).toUpperCase()}
               </span>

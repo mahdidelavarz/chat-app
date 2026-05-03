@@ -29,7 +29,7 @@ export default function MessageInput({ onSendMessage, onTypingStart }: MessageIn
   };
 
   return (
-    <div className="bg-gradient-to-r from-[#1D2733] to-[#222E3C] border-t border-gray-700/50 p-2 sm:p-3 md:p-4 shrink-0 safe-area-bottom">
+    <div className="bg-linear-to-r from-[#1D2733] to-[#222E3C] border-t border-gray-700/50 p-2 sm:p-3 md:p-4 shrink-0 safe-area-bottom">
       <form onSubmit={handleSubmit} className="flex items-center gap-1.5 sm:gap-2">
         <div className="relative shrink-0">
           <button
@@ -65,9 +65,9 @@ export default function MessageInput({ onSendMessage, onTypingStart }: MessageIn
         <button
           type="submit"
           disabled={!newMessage.trim()}
-          className="shrink-0 p-2 sm:p-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+          className="shrink-0  p-2 sm:p-2.5 bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
         >
-          <SolarArrowDown width={20} height={20} className="text-white rotate-180 sm:w-6 sm:h-6" />
+          <SolarArrowDown width={20} height={20} className="text-white  sm:w-6 sm:h-6" />
         </button>
       </form>
     </div>

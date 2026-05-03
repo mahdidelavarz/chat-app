@@ -48,7 +48,7 @@ export default function ChatArea({
   formatTime,
 }: ChatAreaProps) {
   return (
-    <div className="flex-1 flex flex-col w-full h-[100dvh]">
+    <div className="flex-1 flex flex-col w-full h-dvh">
       <ChatHeader selectedUser={selectedUser} isTyping={isTyping} isOnline={isOnline} />
       
       <MessagesList

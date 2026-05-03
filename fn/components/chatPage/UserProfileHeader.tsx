@@ -10,11 +10,11 @@ interface UserProfileHeaderProps {
 
 export default function UserProfileHeader({ user, onLogout }: UserProfileHeaderProps) {
   return (
-    <div className="p-4 sm:p-5 border-b border-gray-700/50 bg-gradient-to-r from-[#1D2733] to-[#222E3C] shrink-0">
+    <div className="p-4 sm:p-5 border-b border-gray-700/50 bg-linear-to-r from-[#1D2733] to-[#222E3C] shrink-0">
       <div className="flex justify-between items-center gap-2">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <div className="relative shrink-0">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex justify-center items-center shadow-lg">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex justify-center items-center shadow-lg">
               <SolarUserRoundedBoldDuotone className="text-white w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div className="absolute bottom-0 right-0 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-green-500 rounded-full border-2 border-[#1D2733]"></div>

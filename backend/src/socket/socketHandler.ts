@@ -3,7 +3,6 @@ import { AppDataSource } from "../config/data-source";
 import { User } from "../models/User";
 import { Message } from "../models/Messages";
 
-
 const userRepository = AppDataSource.getRepository(User);
 const messageRepository = AppDataSource.getRepository(Message);
 
@@ -20,11 +19,7 @@ export const setupSocket = (io: Server) => {
 
         socket.on("userOnline", async (userId: number) => {
             onlineUsers.set(userId, socket.id);
-
-            // Update user socketId in database
             await userRepository.update(userId, { socketId: socket.id });
-
-            // Broadcast online status
             io.emit("usersOnline", Array.from(onlineUsers.keys()));
         });
 
@@ -34,7 +29,6 @@ export const setupSocket = (io: Server) => {
             content: string;
         }) => {
             try {
-                // Save message to database
                 const message = messageRepository.create({
                     senderId: data.senderId,
                     receiverId: data.receiverId,
@@ -42,8 +36,6 @@ export const setupSocket = (io: Server) => {
                 });
 
                 const savedMessage = await messageRepository.save(message);
-
-                // Get sender info
                 const sender = await userRepository.findOneBy({ id: data.senderId });
 
                 const messageData = {
@@ -52,6 +44,7 @@ export const setupSocket = (io: Server) => {
                     senderId: savedMessage.senderId,
                     receiverId: savedMessage.receiverId,
                     createdAt: savedMessage.createdAt,
+                    isRead: savedMessage.isRead,
                     sender: {
                         id: sender?.id,
                         username: sender?.username,
@@ -59,13 +52,11 @@ export const setupSocket = (io: Server) => {
                     }
                 };
 
-                // Send to receiver if online
                 const receiverSocketId = onlineUsers.get(data.receiverId);
                 if (receiverSocketId) {
                     io.to(receiverSocketId).emit("newMessage", messageData);
                 }
 
-                // Confirm to sender
                 socket.emit("messageSent", messageData);
 
             } catch (error) {
@@ -84,10 +75,37 @@ export const setupSocket = (io: Server) => {
             }
         });
 
+        // Add delete message handler
+        socket.on("deleteMessage", async (data: { messageId: number; userId: number }) => {
+            try {
+                const message = await messageRepository.findOne({
+                    where: { id: data.messageId }
+                });
+
+                if (message && message.senderId === data.userId) {
+                    await messageRepository.remove(message);
+                    
+                    // Notify both users about deletion
+                    const receiverSocketId = onlineUsers.get(message.receiverId);
+                    const senderSocketId = onlineUsers.get(message.senderId);
+                    
+                    const deletionData = { messageId: data.messageId };
+                    
+                    if (receiverSocketId) {
+                        io.to(receiverSocketId).emit("messageDeleted", deletionData);
+                    }
+                    if (senderSocketId) {
+                        io.to(senderSocketId).emit("messageDeleted", deletionData);
+                    }
+                }
+            } catch (error) {
+                console.error("Error deleting message via socket:", error);
+            }
+        });
+
         socket.on("disconnect", async () => {
             console.log("User disconnected:", socket.id);
 
-            // Remove user from online users
             let disconnectedUserId: number | undefined;
             for (const [userId, socketId] of onlineUsers.entries()) {
                 if (socketId === socket.id) {

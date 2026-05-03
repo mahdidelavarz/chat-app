@@ -28,8 +28,8 @@ export default function MessageBubble({ message, isOwn, senderName, onMessageCli
       <div
         className={`max-w-[85%] sm:max-w-[75%] px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-lg transition-all hover:shadow-xl ${
           isOwn
-            ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-br-md"
-            : "bg-gradient-to-br from-gray-700 to-gray-800 text-slate-100 rounded-bl-md"
+            ? "bg-linear-to-br from-blue-500 to-blue-600 text-white rounded-br-md"
+            : "bg-linear-to-br from-gray-700 to-gray-800 text-slate-100 rounded-bl-md"
         }`}
       >
         {!isOwn && senderName && (
@@ -40,7 +40,7 @@ export default function MessageBubble({ message, isOwn, senderName, onMessageCli
             <p className="text-xs opacity-70 line-clamp-2">{replyContent}</p>
           </div>
         )}
-        <p className="break-words text-sm leading-relaxed">{actualContent}</p>
+        <p className="wrap-break-words text-sm leading-relaxed">{actualContent}</p>
         <div className="flex items-center justify-end gap-2 mt-1">
           <p className="text-[10px] opacity-70">{formatTime(message.createdAt)}</p>
           {isOwn && message.isRead && <DoubleCheck />}
