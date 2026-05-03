@@ -192,3 +192,38 @@ export const confirmDelete = async (
         }
     }
 };
+
+export const handleMessagesRead = (
+  data: { userId: number; messageIds: number[] },
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>
+) => {
+  setMessages(prev => prev.map(msg => {
+    if (msg.senderId === data.userId && (data.messageIds.length === 0 || data.messageIds.includes(msg.id))) {
+      return { ...msg, isRead: true };
+    }
+    return msg;
+  }));
+};
+
+export const markConversationMessagesAsRead = (
+  selectedUser: User | null,
+  messages: Message[],
+  markAsRead: (messageId: number) => void,
+  markConversationAsRead: (otherUserId: number) => void
+) => {
+  if (!selectedUser) return;
+  
+  // Mark all unread messages from selected user as read
+  const unreadMessages = messages.filter(
+    msg => msg.senderId === selectedUser.id && !msg.isRead
+  );
+  
+  if (unreadMessages.length > 0) {
+    unreadMessages.forEach(msg => {
+      markAsRead(msg.id);
+    });
+    
+    // Also mark conversation as read via socket
+    markConversationAsRead(selectedUser.id);
+  }
+};

@@ -10,9 +10,17 @@ interface MessagesListProps {
   selectedUser: User;
   onMessageClick: (message: Message) => void;
   formatTime: (date: string) => string;
+  onMessageVisible?: (messageId: number) => void;
 }
 
-export default function MessagesList({ messages, currentUser, selectedUser, onMessageClick, formatTime }: MessagesListProps) {
+export default function MessagesList({
+  messages,
+  currentUser,
+  selectedUser,
+  onMessageClick,
+  formatTime,
+  onMessageVisible,
+}: MessagesListProps) {
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -29,6 +37,7 @@ export default function MessagesList({ messages, currentUser, selectedUser, onMe
           senderName={selectedUser.fullName || selectedUser.username}
           onMessageClick={onMessageClick}
           formatTime={formatTime}
+          onMessageVisible={onMessageVisible}
         />
       ))}
       <div ref={messagesEndRef} />

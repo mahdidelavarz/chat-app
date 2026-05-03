@@ -9,7 +9,8 @@ export const useSocket = (
     userId: number | undefined,
     selectedUser: User | null,
     onNewMessage: (message: Message) => void,
-    onTyping: (userId: number, isTyping: boolean) => void
+    onTyping: (userId: number, isTyping: boolean) => void,
+    onMessagesRead?: (data: { userId: number; messageIds: number[] }) => void // Add this callback
 ) => {
     const [socket, setSocket] = useState<Socket | null>(null);
     const [onlineUsers, setOnlineUsers] = useState<number[]>([]);
@@ -17,14 +18,16 @@ export const useSocket = (
     // Use refs to avoid unnecessary re-renders and stale closures
     const onNewMessageRef = useRef(onNewMessage);
     const onTypingRef = useRef(onTyping);
+    const onMessagesReadRef = useRef(onMessagesRead);
     const selectedUserRef = useRef(selectedUser);
 
     // Update refs when callbacks change
     useEffect(() => {
         onNewMessageRef.current = onNewMessage;
         onTypingRef.current = onTyping;
+        onMessagesReadRef.current = onMessagesRead;
         selectedUserRef.current = selectedUser;
-    }, [onNewMessage, onTyping, selectedUser]);
+    }, [onNewMessage, onTyping, onMessagesRead, selectedUser]);
 
     useEffect(() => {
         if (!userId) return;
@@ -41,6 +44,20 @@ export const useSocket = (
         const handleNewMessage = (message: Message) => {
             console.log('New message received:', message);
             onNewMessageRef.current(message);
+            
+            // Auto-mark message as read if it's from selected user and chat is open
+            if (selectedUserRef.current && message.senderId === selectedUserRef.current.id) {
+                // Mark as read via API
+                apiService.markAsRead(message.id).catch(console.error);
+                
+                // Emit read receipt via socket
+                if (newSocket && newSocket.connected) {
+                    newSocket.emit('markAsRead', { 
+                        messageId: message.id, 
+                        userId: userId 
+                    });
+                }
+            }
         };
 
         // Handle message sent confirmation
@@ -68,6 +85,35 @@ export const useSocket = (
             // You can implement a callback for conversation deletion if needed
         };
 
+        // Handle messages read receipts
+        const handleMessagesRead = (data: { userId: number; messageIds: number[] }) => {
+            console.log('Messages read:', data);
+            
+            // Update message read status in UI
+            if (onMessagesReadRef.current) {
+                onMessagesReadRef.current(data);
+            }
+            
+            // If the read receipt is for messages we sent to the selected user
+            if (selectedUserRef.current && data.userId === selectedUserRef.current.id) {
+                // You can trigger a re-fetch or update local state
+                console.log(`User ${data.userId} read messages`);
+            }
+        };
+
+        // Handle individual message read receipt
+        const handleMessageRead = ({ messageId, userId: readerId }: { messageId: number; userId: number }) => {
+            console.log(`Message ${messageId} read by user ${readerId}`);
+            
+            // Update specific message as read in your state
+            if (onMessagesReadRef.current) {
+                onMessagesReadRef.current({ 
+                    userId: readerId, 
+                    messageIds: [messageId] 
+                });
+            }
+        };
+
         // Register event listeners
         newSocket.on('usersOnline', handleUsersOnline);
         newSocket.on('newMessage', handleNewMessage);
@@ -75,6 +121,8 @@ export const useSocket = (
         newSocket.on('userTyping', handleUserTyping);
         newSocket.on('messageDeleted', handleMessageDeleted);
         newSocket.on('conversationDeleted', handleConversationDeleted);
+        newSocket.on('messagesRead', handleMessagesRead);
+        newSocket.on('messageRead', handleMessageRead);
 
         // Cleanup function
         return () => {
@@ -84,6 +132,8 @@ export const useSocket = (
             newSocket.off('userTyping', handleUserTyping);
             newSocket.off('messageDeleted', handleMessageDeleted);
             newSocket.off('conversationDeleted', handleConversationDeleted);
+            newSocket.off('messagesRead', handleMessagesRead);
+            newSocket.off('messageRead', handleMessageRead);
             
             // Don't disconnect if there are other components using the socket
             // apiService.disconnectSocket();
@@ -115,6 +165,15 @@ export const useSocket = (
     const markAsRead = useCallback((messageId: number) => {
         if (socket && socket.connected) {
             socket.emit('markAsRead', { messageId, userId });
+        } else {
+            // Fallback to API call
+            apiService.markAsRead(messageId).catch(console.error);
+        }
+    }, [socket, userId]);
+
+    const markConversationAsRead = useCallback((otherUserId: number) => {
+        if (socket && socket.connected) {
+            socket.emit('markConversationAsRead', { otherUserId, userId });
         }
     }, [socket, userId]);
 
@@ -124,6 +183,7 @@ export const useSocket = (
         sendTyping,
         deleteMessage,
         markAsRead,
+        markConversationAsRead,
         isConnected: socket?.connected || false 
     };
 };

@@ -84,13 +84,13 @@ export const setupSocket = (io: Server) => {
 
                 if (message && message.senderId === data.userId) {
                     await messageRepository.remove(message);
-                    
+
                     // Notify both users about deletion
                     const receiverSocketId = onlineUsers.get(message.receiverId);
                     const senderSocketId = onlineUsers.get(message.senderId);
-                    
+
                     const deletionData = { messageId: data.messageId };
-                    
+
                     if (receiverSocketId) {
                         io.to(receiverSocketId).emit("messageDeleted", deletionData);
                     }
@@ -118,6 +118,58 @@ export const setupSocket = (io: Server) => {
             if (disconnectedUserId) {
                 await userRepository.update(disconnectedUserId, { socketId: "" });
                 io.emit("usersOnline", Array.from(onlineUsers.keys()));
+            }
+        });
+        // Add to your socket handler
+        socket.on('markAsRead', async (data: { messageId: number; userId: number }) => {
+            try {
+                // Update message as read in database
+                await messageRepository.update(data.messageId, {
+                    isRead: true,
+                    readAt: new Date()
+                });
+
+                // Get the message to find sender
+                const message = await messageRepository.findOneBy({ id: data.messageId });
+
+                if (message) {
+                    // Notify the sender that their message was read
+                    const senderSocketId = onlineUsers.get(message.senderId);
+                    if (senderSocketId) {
+                        io.to(senderSocketId).emit('messageRead', {
+                            messageId: data.messageId,
+                            userId: data.userId
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error marking message as read:', error);
+            }
+        });
+
+        socket.on('markConversationAsRead', async (data: { otherUserId: number; userId: number }) => {
+            try {
+                // Mark all unread messages from otherUserId to userId as read
+                await messageRepository
+                    .createQueryBuilder()
+                    .update(Message)
+                    .set({ isRead: true, readAt: new Date() })
+                    .where("senderId = :senderId AND receiverId = :receiverId AND isRead = false", {
+                        senderId: data.otherUserId,
+                        receiverId: data.userId
+                    })
+                    .execute();
+
+                // Notify the sender that all messages were read
+                const senderSocketId = onlineUsers.get(data.otherUserId);
+                if (senderSocketId) {
+                    io.to(senderSocketId).emit('messagesRead', {
+                        userId: data.userId,
+                        messageIds: []
+                    });
+                }
+            } catch (error) {
+                console.error('Error marking conversation as read:', error);
             }
         });
     });

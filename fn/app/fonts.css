@@ -1,0 +1,39 @@
+/* 
+    @font-face iransans
+    normal
+*/
+@font-face {
+  font-family: iransans;
+  src:
+    url("../assets/fonts/iransans.woff2") format("woff"),
+    url("../assets/fonts/iransans.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+/* 
+    @font-face iransans
+    medium
+*/
+@font-face {
+  font-family: iransans-medium;
+  src:
+    url("../assets/fonts/iransans-medium.woff") format("woff"),
+    url("../assets/fonts/iransans-medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+/* 
+    @font-face iransans
+    normal
+*/
+@font-face {
+  font-family: iransans-black;
+  src:
+    url("../assets/fonts/iransans-black.woff") format("woff"),
+    url("../assets/fonts/iransans-black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
