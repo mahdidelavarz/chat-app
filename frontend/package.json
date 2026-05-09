@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "dev:network": "cross-env BACKEND_URL=http://172.16.2.99:5000 next dev",
-    "start": "next start",
-    "lint": "eslint",
-    "https-start": "set NODE_ENV=production && node server.js"
+    "dev:postgres": "cross-env NODE_ENV=development dotenv -e .env.local.postgres -- next dev",
+    "dev:sqlserver": "cross-env NODE_ENV=development dotenv -e .env.local.sqlserver -- next dev",
+    "dev": "npm run dev:postgres",
+    "build:postgres": "cross-env NODE_ENV=production dotenv -e .env.production -- next build",
+    "build:sqlserver": "cross-env NODE_ENV=production dotenv -e .env.production -- next build",
+    "start": "next start"
   },
   "dependencies": {
     "@serwist/next": "^9.5.7",
