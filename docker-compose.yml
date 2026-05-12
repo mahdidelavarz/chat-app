@@ -1,0 +1,74 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: chat-postgres-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-node_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change_this_password}
+      POSTGRES_DB: ${DB_DATABASE:-chatDb}
+    ports:
+      - "5432:5432"  # Or remove this line if you don't need external access
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - chat-network-prod
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-node_user} -d ${DB_DATABASE:-chatDb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: chat-backend-prod
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-node_user}
+      - DB_PASSWORD=${DB_PASSWORD:-change_this_password}
+      - DB_DATABASE=${DB_DATABASE:-chatDb}
+      - DB_SYNCHRONIZE=false  # NEVER synchronize in production
+      - DB_LOGGING=false
+      - JWT_SECRET=${JWT_SECRET:-change_this_to_strong_secret}
+      - JWT_EXPIRES_IN=7d
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://yourdomain.com}
+      - FRONTEND_URL=${FRONTEND_URL:-https://yourdomain.com}
+      - PORT=5000
+      - HOST=0.0.0.0
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - chat-network-prod
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: chat-frontend-prod
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://yourdomain.com/api}
+      - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-wss://yourdomain.com}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - chat-network-prod
+
+volumes:
+  postgres_data_prod:
+
+networks:
+  chat-network-prod:
+    driver: bridge

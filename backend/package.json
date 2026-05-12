@@ -4,15 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev:postgres": "cross-env NODE_ENV=development dotenv -e .env.postgres.local -- ts-node src/server.ts",
-    "dev:sqlserver": "cross-env NODE_ENV=development dotenv -e .env.sqlserver.local -- ts-node src/server.ts",
-    "dev": "npm run dev:postgres",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
-    "start:postgres": "cross-env NODE_ENV=production dotenv -e .env.postgres.local -- node dist/server.js",
-    "start:sqlserver": "cross-env NODE_ENV=production dotenv -e .env.sqlserver.local -- node dist/server.js",
-    "migration:run:postgres": "cross-env NODE_ENV=development dotenv -e .env.postgres.local -- ts-node node_modules/typeorm/cli.js migration:run",
-    "migration:run:sqlserver": "cross-env NODE_ENV=development dotenv -e .env.sqlserver.local -- ts-node node_modules/typeorm/cli.js migration:run"
+    "start": "node dist/index.js",
+    "typeorm": "typeorm-ts-node-commonjs"
   },
   "keywords": [],
   "author": "",

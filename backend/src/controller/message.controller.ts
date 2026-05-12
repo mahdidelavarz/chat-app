@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { AppDataSource } from "../config/data-source";
+import { AppDataSource } from "../config/database";
 import { AuthRequest } from "../middleware/auth";
 import { Message } from "../models/Messages";
 import { User } from "../models/User";

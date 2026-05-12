@@ -2,7 +2,7 @@ import axios, { type AxiosInstance } from 'axios';
 import { io, Socket } from 'socket.io-client';
 import type { AuthResponse, LoginCredentials, Message, RegisterData, User } from '../types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 class ApiService {
     private api: AxiosInstance;

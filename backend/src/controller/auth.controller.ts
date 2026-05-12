@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { AppDataSource } from "../config/data-source";
+import { AppDataSource } from "../config/database";
 import { User } from "../models/User";
 
 

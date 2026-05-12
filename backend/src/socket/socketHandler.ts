@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { AppDataSource } from "../config/data-source";
+import { AppDataSource } from "../config/database";
 import { User } from "../models/User";
 import { Message } from "../models/Messages";
 

@@ -3,11 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev:postgres": "cross-env NODE_ENV=development dotenv -e .env.local.postgres -- next dev",
-    "dev:sqlserver": "cross-env NODE_ENV=development dotenv -e .env.local.sqlserver -- next dev",
-    "dev": "npm run dev:postgres",
-    "build:postgres": "cross-env NODE_ENV=production dotenv -e .env.production -- next build",
-    "build:sqlserver": "cross-env NODE_ENV=production dotenv -e .env.production -- next build",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start"
   },
   "dependencies": {
